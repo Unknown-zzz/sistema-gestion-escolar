@@ -9,13 +9,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { courseService } from '../services/courseService';
 import { studentService } from '../services/studentService';
-import { Curso, Grado, Docente } from '../types';
+import { Materia, Curso, Docente } from '../types';
 
-const emptyForm = { nombre: '', codigo: '', grado_id: '', docente_id: '', descripcion: '', numero_horas: '', creditos: 0 };
+const emptyForm = { nombre: '', codigo: '', curso_id: '', docente_id: '', descripcion: '', numero_horas: '', creditos: 0 };
 
 export default function CursosPage() {
+  const [materias, setMaterias] = useState<Materia[]>([]);
   const [cursos, setCursos] = useState<Curso[]>([]);
-  const [grados, setGrados] = useState<Grado[]>([]);
   const [docentes, setDocentes] = useState<Docente[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -25,24 +25,24 @@ export default function CursosPage() {
 
   const load = async () => {
     try {
-      const [cur, gr, doc] = await Promise.all([courseService.getCursos(), studentService.getGrados(), courseService.getDocentes()]);
-      setCursos(cur); setGrados(gr); setDocentes(doc);
+      const [mat, cur, doc] = await Promise.all([courseService.getMaterias(), studentService.getCursos(), courseService.getDocentes()]);
+      setMaterias(mat); setCursos(cur); setDocentes(doc);
     } finally { setLoading(false); }
   };
 
   useEffect(() => { load(); }, []);
 
   const openCreate = () => { setForm(emptyForm); setEditing(null); setError(''); setOpen(true); };
-  const openEdit = (c: Curso) => {
-    setForm({ nombre: c.nombre, codigo: c.codigo, grado_id: c.grado?.id || '', docente_id: c.docente?.id || '', descripcion: c.descripcion, numero_horas: c.numero_horas, creditos: c.creditos });
-    setEditing(c.id); setError(''); setOpen(true);
+  const openEdit = (m: Materia) => {
+    setForm({ nombre: m.nombre, codigo: m.codigo, curso_id: m.curso?.id || '', docente_id: m.docente?.id || '', descripcion: m.descripcion, numero_horas: m.numero_horas, creditos: m.creditos });
+    setEditing(m.id); setError(''); setOpen(true);
   };
 
   const handleSave = async () => {
     setError('');
     try {
-      if (editing) await courseService.updateCurso(editing, form);
-      else await courseService.createCurso(form);
+      if (editing) await courseService.updateMateria(editing, form);
+      else await courseService.createMateria(form);
       setOpen(false); load();
     } catch (err: any) {
       setError(err.response?.data ? JSON.stringify(err.response.data) : 'Error al guardar.');
@@ -50,8 +50,8 @@ export default function CursosPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Desactivar este curso?')) return;
-    await courseService.deleteCurso(id);
+    if (!window.confirm('¿Desactivar esta materia?')) return;
+    await courseService.deleteMateria(id);
     load();
   };
 
@@ -64,8 +64,8 @@ export default function CursosPage() {
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5" sx={{ fontWeight: 700 }}>Cursos</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate} sx={{ borderRadius: 2 }}>Nuevo Curso</Button>
+        <Typography variant="h5" sx={{ fontWeight: 700 }}>Materias</Typography>
+        <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate} sx={{ borderRadius: 2 }}>Nueva Materia</Button>
       </Box>
 
       <Card sx={{ borderRadius: 3, boxShadow: 2 }}>
@@ -73,26 +73,26 @@ export default function CursosPage() {
           <Table>
             <TableHead>
               <TableRow sx={{ bgcolor: 'grey.50' }}>
-                {['Nombre', 'Código', 'Grado', 'Docente', 'Horas', 'Estado', 'Acciones'].map(h => (
+                {['Nombre', 'Código', 'Curso', 'Docente', 'Horas', 'Estado', 'Acciones'].map(h => (
                   <TableCell key={h} align={h === 'Acciones' ? 'right' : 'left'}><b>{h}</b></TableCell>
                 ))}
               </TableRow>
             </TableHead>
             <TableBody>
-              {cursos.length === 0 && (
-                <TableRow><TableCell colSpan={7} align="center" sx={{ py: 4, color: 'text.secondary' }}>No hay cursos registrados</TableCell></TableRow>
+              {materias.length === 0 && (
+                <TableRow><TableCell colSpan={7} align="center" sx={{ py: 4, color: 'text.secondary' }}>No hay materias registradas</TableCell></TableRow>
               )}
-              {cursos.map(c => (
-                <TableRow key={c.id} hover>
-                  <TableCell>{c.nombre}</TableCell>
-                  <TableCell><Chip label={c.codigo} size="small" variant="outlined" /></TableCell>
-                  <TableCell>{c.grado?.nombre || '—'}</TableCell>
-                  <TableCell>{c.docente ? `${c.docente.user.first_name} ${c.docente.user.last_name}` : '—'}</TableCell>
-                  <TableCell>{c.numero_horas}h</TableCell>
-                  <TableCell><Chip label={c.estado ? 'Activo' : 'Inactivo'} color={c.estado ? 'success' : 'default'} size="small" /></TableCell>
+              {materias.map(m => (
+                <TableRow key={m.id} hover>
+                  <TableCell>{m.nombre}</TableCell>
+                  <TableCell><Chip label={m.codigo} size="small" variant="outlined" /></TableCell>
+                  <TableCell>{m.curso?.nombre || '—'}</TableCell>
+                  <TableCell>{m.docente ? `${m.docente.user.first_name} ${m.docente.user.last_name}` : '—'}</TableCell>
+                  <TableCell>{m.numero_horas}h</TableCell>
+                  <TableCell><Chip label={m.estado ? 'Activo' : 'Inactivo'} color={m.estado ? 'success' : 'default'} size="small" /></TableCell>
                   <TableCell align="right">
-                    <Tooltip title="Editar"><IconButton size="small" onClick={() => openEdit(c)}><EditIcon fontSize="small" /></IconButton></Tooltip>
-                    <Tooltip title="Desactivar"><IconButton size="small" color="error" onClick={() => handleDelete(c.id)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
+                    <Tooltip title="Editar"><IconButton size="small" onClick={() => openEdit(m)}><EditIcon fontSize="small" /></IconButton></Tooltip>
+                    <Tooltip title="Desactivar"><IconButton size="small" color="error" onClick={() => handleDelete(m.id)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
                   </TableCell>
                 </TableRow>
               ))}
@@ -102,13 +102,13 @@ export default function CursosPage() {
       </Card>
 
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editing ? 'Editar Curso' : 'Nuevo Curso'}</DialogTitle>
+        <DialogTitle>{editing ? 'Editar Materia' : 'Nueva Materia'}</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
           {error && <Alert severity="error">{error}</Alert>}
           <TextField label="Nombre" value={form.nombre} onChange={e => setForm({ ...form, nombre: e.target.value })} fullWidth />
           <TextField label="Código" value={form.codigo} onChange={e => setForm({ ...form, codigo: e.target.value })} fullWidth />
-          <TextField label="Grado" select value={form.grado_id} onChange={e => setForm({ ...form, grado_id: e.target.value })} fullWidth>
-            {grados.map(g => <MenuItem key={g.id} value={g.id}>{g.nombre}</MenuItem>)}
+          <TextField label="Curso" select value={form.curso_id} onChange={e => setForm({ ...form, curso_id: e.target.value })} fullWidth>
+            {cursos.map(c => <MenuItem key={c.id} value={c.id}>{c.nombre}</MenuItem>)}
           </TextField>
           <TextField label="Docente" select value={form.docente_id} onChange={e => setForm({ ...form, docente_id: e.target.value })} fullWidth>
             <MenuItem value="">Sin asignar</MenuItem>

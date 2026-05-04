@@ -12,6 +12,8 @@ import CursosPage from './pages/CursosPage';
 import CalificacionesPage from './pages/CalificacionesPage';
 import AsistenciaPage from './pages/AsistenciaPage';
 import PagosPage from './pages/PagosPage';
+import InscripcionesPage from './pages/InscripcionesPage';
+import HorarioPage from './pages/HorarioPage';
 import TeacherDashboard from './pages/teacher/TeacherDashboard';
 import TeacherCoursePage from './pages/teacher/TeacherCoursePage';
 import StudentPortalPage from './pages/student/StudentPortalPage';
@@ -60,6 +62,8 @@ export default function App() {
               <Route path="calificaciones" element={<CalificacionesPage />} />
               <Route path="asistencia" element={<AsistenciaPage />} />
               <Route path="pagos" element={<PagosPage />} />
+              <Route path="inscripciones" element={<InscripcionesPage />} />
+              <Route path="horario" element={<HorarioPage />} />
 
               {/* Teacher routes */}
               <Route path="docente" element={<TeacherDashboard />} />

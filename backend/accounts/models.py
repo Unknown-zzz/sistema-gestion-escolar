@@ -29,7 +29,7 @@ class User(AbstractUser):
         return f"{self.get_full_name()} ({self.role})"
 
 
-class Grado(models.Model):
+class Curso(models.Model):
     NIVEL_CHOICES = (
         ('inicial', 'Inicial'),
         ('primaria', 'Primaria'),
@@ -39,6 +39,7 @@ class Grado(models.Model):
     nombre = models.CharField(max_length=50)
     nivel = models.CharField(max_length=20, choices=NIVEL_CHOICES)
     cantidad_secciones = models.IntegerField(default=1)
+    periodo = models.CharField(max_length=20, blank=True, default='')
     estado = models.BooleanField(default=True)
 
     def __str__(self):
@@ -57,7 +58,7 @@ class Estudiante(models.Model):
     numero_expediente = models.CharField(max_length=50, unique=True)
     documento = models.CharField(max_length=20, unique=True)
     fecha_nacimiento = models.DateField()
-    grado = models.ForeignKey(Grado, on_delete=models.SET_NULL, null=True, related_name='estudiantes')
+    curso = models.ForeignKey(Curso, on_delete=models.SET_NULL, null=True, blank=True, related_name='estudiantes')
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='activo')
     created_at = models.DateTimeField(auto_now_add=True)
 

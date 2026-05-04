@@ -3,38 +3,40 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import User, Grado, Estudiante, Docente
+from .models import User, Curso, Estudiante, Docente
 from .serializers import (
     RegisterSerializer, LoginSerializer, UserSerializer,
-    ChangePasswordSerializer, GradoSerializer, EstudianteSerializer, DocenteSerializer
+    ChangePasswordSerializer, CursoSerializer, EstudianteSerializer, DocenteSerializer
 )
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def mis_cursos(request):
-    """Cursos del usuario según su rol: docente → cursos asignados, estudiante → cursos matriculados."""
-    from courses.serializers import CursoSerializer
-    from courses.models import Curso, Matricula
+def mis_materias(request):
+    """Materias del usuario según su rol."""
+    from courses.serializers import MateriaSerializer
+    from courses.models import Materia
 
     user = request.user
     if user.role == 'docente':
         try:
             docente = Docente.objects.get(user=user)
-            cursos = Curso.objects.filter(docente=docente, estado=True)
+            materias = Materia.objects.filter(docente=docente, estado=True)
         except Docente.DoesNotExist:
-            cursos = Curso.objects.none()
+            materias = Materia.objects.none()
     elif user.role == 'estudiante':
         try:
             estudiante = Estudiante.objects.get(user=user)
-            matriculas = Matricula.objects.filter(estudiante=estudiante, estado='activo').select_related('curso')
-            cursos = [m.curso for m in matriculas if m.curso.estado]
+            if estudiante.curso:
+                materias = Materia.objects.filter(curso=estudiante.curso, estado=True)
+            else:
+                materias = Materia.objects.none()
         except Estudiante.DoesNotExist:
-            cursos = []
+            materias = Materia.objects.none()
     else:
-        cursos = Curso.objects.filter(estado=True)
+        materias = Materia.objects.filter(estado=True)
 
-    return Response(CursoSerializer(cursos, many=True).data)
+    return Response(MateriaSerializer(materias, many=True).data)
 
 
 # ── Auth ──────────────────────────────────────────────────────────────────────
@@ -116,14 +118,14 @@ def logout(request):
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# ── Grados ────────────────────────────────────────────────────────────────────
+# ── Cursos (nivel académico) ──────────────────────────────────────────────────
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
-def grados_list(request):
+def cursos_list(request):
     if request.method == 'GET':
-        return Response(GradoSerializer(Grado.objects.filter(estado=True), many=True).data)
-    serializer = GradoSerializer(data=request.data)
+        return Response(CursoSerializer(Curso.objects.filter(estado=True), many=True).data)
+    serializer = CursoSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -132,21 +134,21 @@ def grados_list(request):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([IsAuthenticated])
-def grado_detail(request, pk):
+def curso_detail(request, pk):
     try:
-        grado = Grado.objects.get(pk=pk)
-    except Grado.DoesNotExist:
-        return Response({'error': 'Grado no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+        curso = Curso.objects.get(pk=pk)
+    except Curso.DoesNotExist:
+        return Response({'error': 'Curso no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
-        return Response(GradoSerializer(grado).data)
+        return Response(CursoSerializer(curso).data)
     if request.method == 'PUT':
-        serializer = GradoSerializer(grado, data=request.data, partial=True)
+        serializer = CursoSerializer(curso, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    grado.estado = False
-    grado.save()
+    curso.estado = False
+    curso.save()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -156,13 +158,13 @@ def grado_detail(request, pk):
 @permission_classes([IsAuthenticated])
 def estudiantes_list(request):
     if request.method == 'GET':
-        qs = Estudiante.objects.select_related('user', 'grado').all()
+        qs = Estudiante.objects.select_related('user', 'curso').all()
         estado = request.query_params.get('estado')
-        grado_id = request.query_params.get('grado')
+        curso_id = request.query_params.get('curso')
         if estado:
             qs = qs.filter(estado=estado)
-        if grado_id:
-            qs = qs.filter(grado_id=grado_id)
+        if curso_id:
+            qs = qs.filter(curso_id=curso_id)
         return Response(EstudianteSerializer(qs, many=True).data)
     serializer = EstudianteSerializer(data=request.data)
     if serializer.is_valid():
@@ -175,7 +177,7 @@ def estudiantes_list(request):
 @permission_classes([IsAuthenticated])
 def estudiante_detail(request, pk):
     try:
-        estudiante = Estudiante.objects.select_related('user', 'grado').get(pk=pk)
+        estudiante = Estudiante.objects.select_related('user', 'curso').get(pk=pk)
     except Estudiante.DoesNotExist:
         return Response({'error': 'Estudiante no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':

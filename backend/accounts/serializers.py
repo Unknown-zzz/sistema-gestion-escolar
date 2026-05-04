@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
-from .models import User, Estudiante, Docente, Grado
+from .models import User, Estudiante, Docente, Curso
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -57,20 +57,22 @@ class ChangePasswordSerializer(serializers.Serializer):
         return data
 
 
-class GradoSerializer(serializers.ModelSerializer):
+class CursoSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Grado
+        model = Curso
         fields = '__all__'
 
 
 class EstudianteSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
-    grado = GradoSerializer(read_only=True)
-    grado_id = serializers.PrimaryKeyRelatedField(queryset=Grado.objects.all(), source='grado', write_only=True)
+    curso = CursoSerializer(read_only=True)
+    curso_id = serializers.PrimaryKeyRelatedField(
+        queryset=Curso.objects.all(), source='curso', write_only=True, required=False, allow_null=True
+    )
 
     class Meta:
         model = Estudiante
-        fields = ('id', 'user', 'numero_expediente', 'documento', 'fecha_nacimiento', 'grado', 'grado_id', 'estado', 'created_at')
+        fields = ('id', 'user', 'numero_expediente', 'documento', 'fecha_nacimiento', 'curso', 'curso_id', 'estado', 'created_at')
         read_only_fields = ('id', 'created_at')
 
 

@@ -1,102 +1,158 @@
 import api from './api';
-import { Curso, Matricula, Actividad, Calificacion, Asistencia, Docente,
-         ResumenAsistencia, CentroNotas, EstadoAsistencia } from '../types';
+import { Materia, Inscripcion, Actividad, Calificacion, Asistencia, Docente,
+         ResumenAsistencia, CentroNotas, EstadoAsistencia, HorarioCurso } from '../types';
 
 export const courseService = {
-  // Cursos generales
-  async getCursos(): Promise<Curso[]> {
-    const { data } = await api.get<Curso[]>('/api/v1/cursos/');
+  // Materias
+  async getMaterias(): Promise<Materia[]> {
+    const { data } = await api.get<Materia[]>('/api/v1/materias/');
     return data;
   },
-  async getMisCursos(): Promise<Curso[]> {
-    const { data } = await api.get<Curso[]>('/api/v1/auth/mis-cursos/');
+  async getMisMaterias(): Promise<Materia[]> {
+    const { data } = await api.get<Materia[]>('/api/v1/auth/mis-materias/');
     return data;
   },
-  async createCurso(payload: any): Promise<Curso> {
-    const { data } = await api.post<Curso>('/api/v1/cursos/', payload);
+  async createMateria(payload: any): Promise<Materia> {
+    const { data } = await api.post<Materia>('/api/v1/materias/', payload);
     return data;
   },
-  async updateCurso(id: number, payload: any): Promise<Curso> {
-    const { data } = await api.put<Curso>(`/api/v1/cursos/${id}/`, payload);
+  async updateMateria(id: number, payload: any): Promise<Materia> {
+    const { data } = await api.put<Materia>(`/api/v1/materias/${id}/`, payload);
     return data;
   },
-  async deleteCurso(id: number): Promise<void> {
-    await api.delete(`/api/v1/cursos/${id}/`);
+  async deleteMateria(id: number): Promise<void> {
+    await api.delete(`/api/v1/materias/${id}/`);
   },
 
-  // Estudiantes de un curso
-  async getCursoEstudiantes(cursoId: number) {
-    const { data } = await api.get(`/api/v1/cursos/${cursoId}/estudiantes/`);
-    return data;
-  },
-
-  // Matrículas
-  async getMatriculas(): Promise<Matricula[]> {
-    const { data } = await api.get<Matricula[]>('/api/v1/cursos/matriculas/');
-    return data;
-  },
-  async createMatricula(payload: any): Promise<Matricula> {
-    const { data } = await api.post<Matricula>('/api/v1/cursos/matriculas/', payload);
+  // Estudiantes de una materia
+  async getMateriaEstudiantes(materiaId: number) {
+    const { data } = await api.get(`/api/v1/materias/${materiaId}/estudiantes/`);
     return data;
   },
 
-  // Actividades de un curso
-  async getActividades(cursoId: number): Promise<Actividad[]> {
-    const { data } = await api.get<Actividad[]>(`/api/v1/cursos/${cursoId}/actividades/`);
+  // Inscripciones (solo administrativo)
+  async getInscripciones(params?: { estudiante?: number; curso?: number; estado?: string }): Promise<Inscripcion[]> {
+    const { data } = await api.get<Inscripcion[]>('/api/v1/materias/inscripciones/', { params });
     return data;
   },
-  async createActividad(cursoId: number, payload: any): Promise<Actividad> {
-    const { data } = await api.post<Actividad>(`/api/v1/cursos/${cursoId}/actividades/`, payload);
+  async createInscripcion(payload: { estudiante_id: number; curso_id: number }): Promise<Inscripcion> {
+    const { data } = await api.post<Inscripcion>('/api/v1/materias/inscripciones/', payload);
+    return data;
+  },
+  async updateInscripcion(id: number, estado: string): Promise<Inscripcion> {
+    const { data } = await api.put<Inscripcion>(`/api/v1/materias/inscripciones/${id}/`, { estado });
+    return data;
+  },
+  async deleteInscripcion(id: number): Promise<void> {
+    await api.delete(`/api/v1/materias/inscripciones/${id}/`);
+  },
+
+// Actividades de una materia
+  async getActividades(materiaId: number): Promise<Actividad[]> {
+    const { data } = await api.get<Actividad[]>(`/api/v1/materias/${materiaId}/actividades/`);
+    return data;
+  },
+  async createActividad(materiaId: number, payload: any): Promise<Actividad> {
+    const { data } = await api.post<Actividad>(`/api/v1/materias/${materiaId}/actividades/`, payload);
     return data;
   },
   async updateActividad(id: number, payload: any): Promise<Actividad> {
-    const { data } = await api.put<Actividad>(`/api/v1/cursos/actividades/${id}/`, payload);
+    const { data } = await api.put<Actividad>(`/api/v1/materias/actividades/${id}/`, payload);
     return data;
   },
   async deleteActividad(id: number): Promise<void> {
-    await api.delete(`/api/v1/cursos/actividades/${id}/`);
+    await api.delete(`/api/v1/materias/actividades/${id}/`);
   },
   async getMisPlantillas(): Promise<Actividad[]> {
-    const { data } = await api.get<Actividad[]>('/api/v1/cursos/actividades/plantillas/');
+    const { data } = await api.get<Actividad[]>('/api/v1/materias/actividades/plantillas/');
     return data;
   },
   async guardarComoPlantilla(actividadId: number): Promise<Actividad> {
-    const { data } = await api.post<Actividad>(`/api/v1/cursos/actividades/${actividadId}/guardar-plantilla/`);
+    const { data } = await api.post<Actividad>(`/api/v1/materias/actividades/${actividadId}/guardar-plantilla/`);
     return data;
   },
-  async usarPlantilla(cursoId: number, plantillaId: number): Promise<Actividad> {
-    const { data } = await api.post<Actividad>(`/api/v1/cursos/${cursoId}/actividades/${plantillaId}/usar-plantilla/`);
+  async usarPlantilla(materiaId: number, plantillaId: number): Promise<Actividad> {
+    const { data } = await api.post<Actividad>(`/api/v1/materias/${materiaId}/actividades/${plantillaId}/usar-plantilla/`);
     return data;
   },
 
   // Centro de notas
-  async getCentroNotas(cursoId: number): Promise<CentroNotas> {
-    const { data } = await api.get<CentroNotas>(`/api/v1/cursos/${cursoId}/centro-notas/`);
+  async getCentroNotas(materiaId: number, trimestre?: string): Promise<CentroNotas> {
+    const params: Record<string, string> = {};
+    if (trimestre) params.trimestre = trimestre;
+    const { data } = await api.get<CentroNotas>(`/api/v1/materias/${materiaId}/centro-notas/`, { params });
     return data;
   },
   async guardarNota(estudiante: number, actividad: number, nota: number | null): Promise<Calificacion> {
-    const { data } = await api.post<Calificacion>('/api/v1/cursos/notas/', { estudiante, actividad, nota });
+    const { data } = await api.post<Calificacion>('/api/v1/materias/notas/', { estudiante, actividad, nota });
     return data;
   },
 
   // Asistencia
-  async getAsistenciaCurso(cursoId: number, fecha?: string): Promise<Asistencia[]> {
+  async getAsistenciaMateria(materiaId: number, fecha?: string): Promise<Asistencia[]> {
     const params = fecha ? { fecha } : {};
-    const { data } = await api.get<Asistencia[]>(`/api/v1/cursos/${cursoId}/asistencia/`, { params });
+    const { data } = await api.get<Asistencia[]>(`/api/v1/materias/${materiaId}/asistencia/`, { params });
     return data;
   },
-  async registrarAsistenciaBulk(cursoId: number, fecha: string, registros: { estudiante: number; estado: EstadoAsistencia; motivo?: string }[]): Promise<Asistencia[]> {
-    const { data } = await api.post<Asistencia[]>(`/api/v1/cursos/${cursoId}/asistencia/bulk/`, { fecha, registros });
+  async registrarAsistenciaBulk(materiaId: number, fecha: string, registros: { estudiante: number; estado: EstadoAsistencia; motivo?: string }[]): Promise<Asistencia[]> {
+    const { data } = await api.post<Asistencia[]>(`/api/v1/materias/${materiaId}/asistencia/bulk/`, { fecha, registros });
     return data;
   },
-  async getResumenAsistencia(cursoId: number): Promise<ResumenAsistencia[]> {
-    const { data } = await api.get<ResumenAsistencia[]>(`/api/v1/cursos/${cursoId}/resumen-asistencia/`);
+  async getResumenAsistencia(materiaId: number): Promise<ResumenAsistencia[]> {
+    const { data } = await api.get<ResumenAsistencia[]>(`/api/v1/materias/${materiaId}/resumen-asistencia/`);
     return data;
   },
 
   // Docentes
   async getDocentes(): Promise<Docente[]> {
     const { data } = await api.get<Docente[]>('/api/v1/auth/docentes/');
+    return data;
+  },
+
+  // Horario
+  async getHorario(cursoId: number): Promise<HorarioCurso> {
+    const { data } = await api.get<HorarioCurso>(`/api/v1/materias/horario/${cursoId}/`);
+    return data;
+  },
+  async saveHorario(cursoId: number, payload: { periodos: any[] }): Promise<HorarioCurso> {
+    const { data } = await api.post<HorarioCurso>(`/api/v1/materias/horario/${cursoId}/`, payload);
+    return data;
+  },
+
+  // Exportación Excel
+  async exportarAsistencia(materiaId: number, params: { fecha_inicio?: string; fecha_fin?: string } = {}): Promise<void> {
+    const response = await api.get(`/api/v1/materias/${materiaId}/asistencia/exportar/`, {
+      params,
+      responseType: 'blob',
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `asistencia_materia${materiaId}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  },
+  async exportarNotas(materiaId: number, params: { trimestre?: string } = {}): Promise<void> {
+    const response = await api.get(`/api/v1/materias/${materiaId}/notas/exportar/`, {
+      params,
+      responseType: 'blob',
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `notas_materia${materiaId}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  },
+
+  // Última asistencia (sesión anterior)
+  async getUltimaAsistencia(materiaId: number, antesDe?: string): Promise<{ fecha: string | null; registros: Record<string, EstadoAsistencia> }> {
+    const params = antesDe ? { antes_de: antesDe } : {};
+    const { data } = await api.get(`/api/v1/materias/${materiaId}/ultima-asistencia/`, { params });
     return data;
   },
 };

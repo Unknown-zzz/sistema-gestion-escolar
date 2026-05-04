@@ -1,38 +1,67 @@
 from rest_framework import serializers
-from .models import Curso, Matricula, Actividad, Calificacion, Asistencia
-from accounts.serializers import EstudianteSerializer, DocenteSerializer, GradoSerializer
+from .models import Materia, Inscripcion, Actividad, Calificacion, Asistencia, HorarioCurso, PeriodoHorario, ClaseHorario
+from accounts.serializers import EstudianteSerializer, DocenteSerializer, CursoSerializer
 
 
-class CursoSerializer(serializers.ModelSerializer):
-    grado = GradoSerializer(read_only=True)
-    grado_id = serializers.IntegerField(write_only=True)
+class MateriaSerializer(serializers.ModelSerializer):
+    curso = CursoSerializer(read_only=True)
+    curso_id = serializers.IntegerField(write_only=True)
     docente = DocenteSerializer(read_only=True)
     docente_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
 
     class Meta:
-        model = Curso
-        fields = ('id', 'nombre', 'codigo', 'grado', 'grado_id', 'docente', 'docente_id',
+        model = Materia
+        fields = ('id', 'nombre', 'codigo', 'curso', 'curso_id', 'docente', 'docente_id',
                   'descripcion', 'numero_horas', 'creditos', 'estado')
 
 
-class MatriculaSerializer(serializers.ModelSerializer):
+class InscripcionSerializer(serializers.ModelSerializer):
     estudiante = EstudianteSerializer(read_only=True)
     estudiante_id = serializers.IntegerField(write_only=True)
     curso = CursoSerializer(read_only=True)
     curso_id = serializers.IntegerField(write_only=True)
+    registrada_por = serializers.StringRelatedField(read_only=True)
 
     class Meta:
-        model = Matricula
+        model = Inscripcion
         fields = ('id', 'estudiante', 'estudiante_id', 'curso', 'curso_id',
-                  'periodo', 'fecha_matricula', 'estado')
-        read_only_fields = ('id', 'fecha_matricula')
+                  'fecha_inscripcion', 'estado', 'registrada_por')
+        read_only_fields = ('id', 'fecha_inscripcion', 'registrada_por')
+
+
+
+class ClaseHorarioSerializer(serializers.ModelSerializer):
+    materia_nombre = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ClaseHorario
+        fields = ('id', 'dia', 'materia', 'materia_nombre')
+
+    def get_materia_nombre(self, obj):
+        return obj.materia.nombre if obj.materia else None
+
+
+class PeriodoHorarioSerializer(serializers.ModelSerializer):
+    clases = ClaseHorarioSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = PeriodoHorario
+        fields = ('id', 'orden', 'hora_inicio', 'hora_fin', 'clases')
+
+
+class HorarioCursoSerializer(serializers.ModelSerializer):
+    periodos = PeriodoHorarioSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = HorarioCurso
+        fields = ('id', 'curso', 'periodos', 'updated_at')
 
 
 class ActividadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Actividad
-        fields = ('id', 'curso', 'nombre', 'descripcion', 'tipo', 'fecha',
-                  'ponderacion', 'es_plantilla', 'creada_por', 'created_at')
+        fields = ('id', 'materia', 'nombre', 'descripcion', 'tipo', 'trimestre',
+                  'fecha', 'es_plantilla', 'creada_por', 'created_at')
         read_only_fields = ('id', 'created_at', 'creada_por')
 
 
@@ -59,7 +88,7 @@ class AsistenciaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Asistencia
-        fields = ('id', 'estudiante', 'curso', 'fecha', 'estado', 'motivo',
+        fields = ('id', 'estudiante', 'materia', 'fecha', 'estado', 'motivo',
                   'registrada_por', 'fecha_registro', 'estudiante_nombre')
         read_only_fields = ('id', 'fecha_registro', 'registrada_por', 'estudiante_nombre')
 

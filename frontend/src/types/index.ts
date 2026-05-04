@@ -11,11 +11,12 @@ export interface User {
   created_at: string;
 }
 
-export interface Grado {
+export interface Curso {
   id: number;
   nombre: string;
   nivel: 'inicial' | 'primaria' | 'secundaria';
   cantidad_secciones: number;
+  periodo: string;
   estado: boolean;
 }
 
@@ -25,7 +26,7 @@ export interface Estudiante {
   numero_expediente: string;
   documento: string;
   fecha_nacimiento: string;
-  grado: Grado | null;
+  curso: Curso | null;
   estado: 'activo' | 'inactivo' | 'retirado' | 'egresado';
   created_at: string;
 }
@@ -40,11 +41,11 @@ export interface Docente {
   estado: 'activo' | 'inactivo';
 }
 
-export interface Curso {
+export interface Materia {
   id: number;
   nombre: string;
   codigo: string;
-  grado: Grado;
+  curso: Curso;
   docente: Docente | null;
   descripcion: string;
   numero_horas: number;
@@ -52,23 +53,23 @@ export interface Curso {
   estado: boolean;
 }
 
-export interface Matricula {
+export interface Inscripcion {
   id: number;
   estudiante: Estudiante;
   curso: Curso;
-  periodo: string;
-  fecha_matricula: string;
+  fecha_inscripcion: string;
   estado: 'activo' | 'retirado' | 'culminado';
+  registrada_por: string | null;
 }
 
 export interface Actividad {
   id: number;
-  curso: number | null;
+  materia: number | null;
   nombre: string;
   descripcion: string;
   tipo: 'tarea' | 'examen' | 'proyecto' | 'participacion' | 'otro';
+  trimestre: 'T1' | 'T2' | 'T3';
   fecha: string | null;
-  ponderacion: number;
   es_plantilla: boolean;
   creada_por: number | null;
   created_at: string;
@@ -89,7 +90,7 @@ export type EstadoAsistencia = 'P' | 'F' | 'L';
 export interface Asistencia {
   id: number;
   estudiante: number;
-  curso: number;
+  materia: number;
   fecha: string;
   estado: EstadoAsistencia;
   motivo: string;
@@ -131,6 +132,28 @@ export interface Pago {
   notas: string;
   dias_vencido: number;
   created_at: string;
+}
+
+export interface ClaseHorario {
+  id: number;
+  dia: 'lunes' | 'martes' | 'miercoles' | 'jueves' | 'viernes';
+  materia: number | null;
+  materia_nombre: string | null;
+}
+
+export interface PeriodoHorario {
+  id: number;
+  orden: number;
+  hora_inicio: string;
+  hora_fin: string;
+  clases: ClaseHorario[];
+}
+
+export interface HorarioCurso {
+  id: number;
+  curso: number;
+  periodos: PeriodoHorario[];
+  updated_at: string;
 }
 
 export interface AuthTokens {

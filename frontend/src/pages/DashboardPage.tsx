@@ -36,20 +36,20 @@ function StatCard({ label, value, icon, color, sub }: StatCardProps) {
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const [stats, setStats] = useState({ estudiantes: 0, docentes: 0, cursos: 0, pagos: 0, pagosPendientes: 0 });
+  const [stats, setStats] = useState({ estudiantes: 0, docentes: 0, materias: 0, pagos: 0, pagosPendientes: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       studentService.getEstudiantes(),
       courseService.getDocentes(),
-      courseService.getCursos(),
+      courseService.getMaterias(),
       paymentService.getPagos(),
-    ]).then(([est, doc, cur, pag]) => {
+    ]).then(([est, doc, mat, pag]) => {
       setStats({
         estudiantes: est.length,
         docentes: doc.length,
-        cursos: cur.length,
+        materias: mat.length,
         pagos: pag.length,
         pagosPendientes: pag.filter(p => p.estado === 'pendiente' || p.estado === 'vencido').length,
       });
@@ -84,7 +84,7 @@ export default function DashboardPage() {
           <StatCard label="Docentes" value={stats.docentes} icon={<SchoolIcon />} color="#388e3c" />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <StatCard label="Cursos activos" value={stats.cursos} icon={<BookIcon />} color="#f57c00" />
+          <StatCard label="Materias activas" value={stats.materias} icon={<BookIcon />} color="#f57c00" />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
           <StatCard label="Pagos" value={stats.pagos} icon={<PaymentIcon />} color="#7b1fa2"
@@ -118,7 +118,7 @@ export default function DashboardPage() {
             <CardContent>
               <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>Módulos disponibles</Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                {['Inscripciones', 'Cursos', 'Calificaciones', 'Asistencia', 'Pagos', 'Docentes'].map(m => (
+                {['Inscripciones', 'Materias', 'Calificaciones', 'Asistencia', 'Pagos', 'Docentes'].map(m => (
                   <Chip key={m} label={m} color="primary" variant="outlined" size="small" />
                 ))}
               </Box>

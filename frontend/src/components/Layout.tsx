@@ -13,6 +13,8 @@ import BookIcon from '@mui/icons-material/Book';
 import GradeIcon from '@mui/icons-material/Grade';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import PaymentIcon from '@mui/icons-material/Payment';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -25,8 +27,10 @@ const NAV_ITEMS: { label: string; icon: React.ReactElement; path: string; roles?
   { label: 'Mis Cursos', icon: <BookIcon />, path: '/docente', roles: ['docente'] },
   { label: 'Mi Portal', icon: <BookIcon />, path: '/estudiante', roles: ['estudiante'] },
   { label: 'Estudiantes', icon: <PeopleIcon />, path: '/estudiantes', roles: ['administrativo', 'directivo'] },
+  { label: 'Inscripciones', icon: <AssignmentIndIcon />, path: '/inscripciones', roles: ['administrativo'] },
   { label: 'Docentes', icon: <SchoolIcon />, path: '/docentes', roles: ['administrativo', 'directivo'] },
   { label: 'Cursos', icon: <BookIcon />, path: '/cursos', roles: ['administrativo', 'directivo'] },
+  { label: 'Horario', icon: <CalendarMonthIcon />, path: '/horario', roles: ['administrativo', 'directivo'] },
   { label: 'Calificaciones', icon: <GradeIcon />, path: '/calificaciones', roles: ['administrativo', 'directivo'] },
   { label: 'Asistencia', icon: <EventAvailableIcon />, path: '/asistencia', roles: ['administrativo', 'directivo'] },
   { label: 'Pagos', icon: <PaymentIcon />, path: '/pagos', roles: ['administrativo', 'directivo'] },

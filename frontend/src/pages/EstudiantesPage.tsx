@@ -9,17 +9,17 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { studentService } from '../services/studentService';
-import { Estudiante, Grado } from '../types';
+import { Estudiante, Curso } from '../types';
 
 const ESTADO_COLOR: Record<string, any> = {
   activo: 'success', inactivo: 'default', retirado: 'warning', egresado: 'info',
 };
 
-const emptyForm = { numero_expediente: '', documento: '', fecha_nacimiento: '', grado_id: '', estado: 'activo' };
+const emptyForm = { numero_expediente: '', documento: '', fecha_nacimiento: '', curso_id: '', estado: 'activo' };
 
 export default function EstudiantesPage() {
   const [estudiantes, setEstudiantes] = useState<Estudiante[]>([]);
-  const [grados, setGrados] = useState<Grado[]>([]);
+  const [cursos, setCursos] = useState<Curso[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<any>(emptyForm);
@@ -28,9 +28,9 @@ export default function EstudiantesPage() {
 
   const load = async () => {
     try {
-      const [est, gr] = await Promise.all([studentService.getEstudiantes(), studentService.getGrados()]);
+      const [est, cur] = await Promise.all([studentService.getEstudiantes(), studentService.getCursos()]);
       setEstudiantes(est);
-      setGrados(gr);
+      setCursos(cur);
     } finally {
       setLoading(false);
     }
@@ -40,7 +40,7 @@ export default function EstudiantesPage() {
 
   const openCreate = () => { setForm(emptyForm); setEditing(null); setError(''); setOpen(true); };
   const openEdit = (e: Estudiante) => {
-    setForm({ numero_expediente: e.numero_expediente, documento: e.documento, fecha_nacimiento: e.fecha_nacimiento, grado_id: e.grado?.id || '', estado: e.estado });
+    setForm({ numero_expediente: e.numero_expediente, documento: e.documento, fecha_nacimiento: e.fecha_nacimiento, curso_id: e.curso?.id || '', estado: e.estado });
     setEditing(e.id); setError(''); setOpen(true);
   };
 
@@ -84,7 +84,7 @@ export default function EstudiantesPage() {
                 <TableCell><b>Nombre</b></TableCell>
                 <TableCell><b>Expediente</b></TableCell>
                 <TableCell><b>Documento</b></TableCell>
-                <TableCell><b>Grado</b></TableCell>
+                <TableCell><b>Curso</b></TableCell>
                 <TableCell><b>Estado</b></TableCell>
                 <TableCell align="right"><b>Acciones</b></TableCell>
               </TableRow>
@@ -98,7 +98,7 @@ export default function EstudiantesPage() {
                   <TableCell>{e.user.first_name} {e.user.last_name}</TableCell>
                   <TableCell>{e.numero_expediente}</TableCell>
                   <TableCell>{e.documento}</TableCell>
-                  <TableCell>{e.grado?.nombre || '—'}</TableCell>
+                  <TableCell>{e.curso?.nombre || '—'}</TableCell>
                   <TableCell><Chip label={e.estado} color={ESTADO_COLOR[e.estado]} size="small" /></TableCell>
                   <TableCell align="right">
                     <Tooltip title="Editar"><IconButton size="small" onClick={() => openEdit(e)}><EditIcon fontSize="small" /></IconButton></Tooltip>
@@ -118,8 +118,9 @@ export default function EstudiantesPage() {
           <TextField label="N° Expediente" value={form.numero_expediente} onChange={e => setForm({ ...form, numero_expediente: e.target.value })} fullWidth />
           <TextField label="Documento" value={form.documento} onChange={e => setForm({ ...form, documento: e.target.value })} fullWidth />
           <TextField label="Fecha de nacimiento" type="date" value={form.fecha_nacimiento} onChange={e => setForm({ ...form, fecha_nacimiento: e.target.value })} fullWidth slotProps={{ inputLabel: { shrink: true } }} />
-          <TextField label="Grado" select value={form.grado_id} onChange={e => setForm({ ...form, grado_id: e.target.value })} fullWidth>
-            {grados.map(g => <MenuItem key={g.id} value={g.id}>{g.nombre}</MenuItem>)}
+          <TextField label="Curso" select value={form.curso_id} onChange={e => setForm({ ...form, curso_id: e.target.value })} fullWidth>
+            <MenuItem value="">Sin asignar</MenuItem>
+            {cursos.map(c => <MenuItem key={c.id} value={c.id}>{c.nombre}</MenuItem>)}
           </TextField>
           <TextField label="Estado" select value={form.estado} onChange={e => setForm({ ...form, estado: e.target.value })} fullWidth>
             {['activo', 'inactivo', 'retirado', 'egresado'].map(s => <MenuItem key={s} value={s}>{s}</MenuItem>)}

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Grado, Estudiante, Docente
+from .models import User, Curso, Estudiante, Docente
 
 
 @admin.register(User)
@@ -14,16 +14,16 @@ class UserAdmin(BaseUserAdmin):
     )
 
 
-@admin.register(Grado)
-class GradoAdmin(admin.ModelAdmin):
+@admin.register(Curso)
+class CursoAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'nivel', 'cantidad_secciones', 'estado')
     list_filter = ('nivel', 'estado')
 
 
 @admin.register(Estudiante)
 class EstudianteAdmin(admin.ModelAdmin):
-    list_display = ('user', 'numero_expediente', 'documento', 'grado', 'estado')
-    list_filter = ('estado', 'grado')
+    list_display = ('user', 'numero_expediente', 'documento', 'curso', 'estado')
+    list_filter = ('estado', 'curso')
     search_fields = ('user__first_name', 'user__last_name', 'numero_expediente', 'documento')
 
 
