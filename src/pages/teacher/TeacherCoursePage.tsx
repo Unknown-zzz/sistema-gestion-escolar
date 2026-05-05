@@ -5,7 +5,7 @@ import {
   Table, TableHead, TableRow, TableCell, TableBody, TableContainer,
   ToggleButton, ToggleButtonGroup, TextField, Dialog, DialogTitle,
   DialogContent, DialogActions, MenuItem, Chip, IconButton, Tooltip,
-  Alert, Divider,
+  Alert,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddIcon from '@mui/icons-material/Add';
@@ -577,7 +577,6 @@ function TabCentroNotas({ cursoId }: { cursoId: number }) {
   const [editingCell, setEditingCell] = useState<{ estId: number; actId: number } | null>(null);
   const [cellValue, setCellValue] = useState('');
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [exporting, setExporting] = useState(false);
 
   const load = useCallback(async () => {
@@ -596,12 +595,10 @@ function TabCentroNotas({ cursoId }: { cursoId: number }) {
 
   const handleCellSave = async () => {
     if (!editingCell) return;
-    setSaving(true);
     const nota = cellValue === '' ? null : parseFloat(cellValue);
     await courseService.guardarNota(editingCell.estId, editingCell.actId, nota);
     setEditingCell(null);
     await load();
-    setSaving(false);
   };
 
   const handleExport = async () => {

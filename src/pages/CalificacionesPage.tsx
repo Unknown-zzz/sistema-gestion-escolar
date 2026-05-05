@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   Box, Typography, Card, CircularProgress, MenuItem, TextField,
   Table, TableHead, TableRow, TableCell, TableBody, TableContainer,
-  Alert, Button, Paper,
+  Alert, Button,
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import { courseService } from '../services/courseService';
