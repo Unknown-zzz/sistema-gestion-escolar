@@ -19,6 +19,7 @@ const HorarioPage = lazy(() => import('./pages/HorarioPage'));
 const TeacherDashboard = lazy(() => import('./pages/teacher/TeacherDashboard'));
 const TeacherCoursePage = lazy(() => import('./pages/teacher/TeacherCoursePage'));
 const StudentPortalPage = lazy(() => import('./pages/student/StudentPortalPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 
 const theme = createTheme({
   palette: {
@@ -82,6 +83,9 @@ export default function App() {
 
                 {/* Student routes */}
                 <Route path="estudiante" element={<StudentPortalPage />} />
+
+                {/* Profile route */}
+                <Route path="perfil" element={<ProfilePage />} />
               </Route>
 
               <Route path="*" element={<Navigate to="/" replace />} />

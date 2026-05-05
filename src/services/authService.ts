@@ -20,6 +20,17 @@ export const authService = {
     return data;
   },
 
+  async updateProfile(userData: Partial<User>): Promise<User> {
+    const { data } = await api.patch<User>('/api/v1/auth/profile/', userData);
+    localStorage.setItem('user', JSON.stringify(data));
+    return data;
+  },
+
+  async changePassword(passwordData: any): Promise<{ message: string }> {
+    const { data } = await api.post('/api/v1/auth/change-password/', passwordData);
+    return data;
+  },
+
   getStoredUser(): User | null {
     const u = localStorage.getItem('user');
     return u ? JSON.parse(u) : null;

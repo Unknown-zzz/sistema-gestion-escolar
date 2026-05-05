@@ -15,6 +15,7 @@ import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import PaymentIcon from '@mui/icons-material/Payment';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -34,6 +35,7 @@ const NAV_ITEMS: { label: string; icon: React.ReactElement; path: string; roles?
   { label: 'Calificaciones', icon: <GradeIcon />, path: '/calificaciones', roles: ['administrativo', 'directivo'] },
   { label: 'Asistencia', icon: <EventAvailableIcon />, path: '/asistencia', roles: ['administrativo', 'directivo'] },
   { label: 'Pagos', icon: <PaymentIcon />, path: '/pagos', roles: ['administrativo', 'directivo'] },
+  { label: 'Mi Perfil', icon: <PersonIcon />, path: '/perfil' },
 ];
 
 export default function Layout() {
@@ -113,7 +115,13 @@ export default function Layout() {
             </Avatar>
           </IconButton>
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
-            <MenuItem onClick={handleLogout}><LogoutIcon fontSize="small" sx={{ mr: 1 }} />Cerrar sesión</MenuItem>
+            <MenuItem onClick={() => { navigate('/perfil'); setAnchorEl(null); }}>
+              <PersonIcon fontSize="small" sx={{ mr: 1 }} /> Mi Perfil
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={handleLogout}>
+              <LogoutIcon fontSize="small" sx={{ mr: 1 }} /> Cerrar sesión
+            </MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>
