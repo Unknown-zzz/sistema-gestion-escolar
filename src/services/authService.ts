@@ -21,13 +21,13 @@ export const authService = {
   },
 
   async updateProfile(userData: Partial<User>): Promise<User> {
-    const { data } = await api.patch<User>('/api/v1/auth/profile/', userData);
+    const { data } = await api.patch<User>('/api/v1/auth/profile/update/', userData);
     localStorage.setItem('user', JSON.stringify(data));
     return data;
   },
 
   async changePassword(passwordData: any): Promise<{ message: string }> {
-    const { data } = await api.post('/api/v1/auth/change-password/', passwordData);
+    const { data } = await api.post('/api/v1/auth/profile/change-password/', passwordData);
     return data;
   },
 

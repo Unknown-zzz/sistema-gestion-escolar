@@ -6,6 +6,9 @@ import {
 import SaveIcon from '@mui/icons-material/Save';
 import LockIcon from '@mui/icons-material/Lock';
 import PersonIcon from '@mui/icons-material/Person';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { InputAdornment, IconButton as MuiIconButton } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 import { authService } from '../services/authService';
 
@@ -30,6 +33,8 @@ export default function ProfilePage() {
   });
   const [passLoading, setPassLoading] = useState(false);
   const [passMsg, setPassMsg] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [showOldPass, setShowOldPass] = useState(false);
+  const [showNewPass, setShowNewPass] = useState(false);
 
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -185,24 +190,46 @@ export default function ProfilePage() {
                 <Stack spacing={3}>
                   <TextField
                     label="Contraseña Actual"
-                    type="password"
+                    type={showOldPass ? 'text' : 'password'}
                     fullWidth
                     required
                     value={passForm.old_password}
                     onChange={e => setPassForm({ ...passForm, old_password: e.target.value })}
+                    slotProps={{
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <MuiIconButton onClick={() => setShowOldPass(!showOldPass)} edge="end">
+                              {showOldPass ? <VisibilityOff /> : <Visibility />}
+                            </MuiIconButton>
+                          </InputAdornment>
+                        ),
+                      }
+                    }}
                   />
                   <Divider sx={{ my: 1 }}>Nueva Contraseña</Divider>
                   <TextField
                     label="Nueva Contraseña"
-                    type="password"
+                    type={showNewPass ? 'text' : 'password'}
                     fullWidth
                     required
                     value={passForm.new_password}
                     onChange={e => setPassForm({ ...passForm, new_password: e.target.value })}
+                    slotProps={{
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <MuiIconButton onClick={() => setShowNewPass(!showNewPass)} edge="end">
+                              {showNewPass ? <VisibilityOff /> : <Visibility />}
+                            </MuiIconButton>
+                          </InputAdornment>
+                        ),
+                      }
+                    }}
                   />
                   <TextField
                     label="Confirmar Nueva Contraseña"
-                    type="password"
+                    type={showNewPass ? 'text' : 'password'}
                     fullWidth
                     required
                     value={passForm.new_password2}
